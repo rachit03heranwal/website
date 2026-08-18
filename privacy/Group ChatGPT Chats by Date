@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy — ChatGPT Day Grouper</title>
+<title>Privacy Policy — Group ChatGPT Chats by Date</title>
 <style>
   :root {
     --bg: #0b0d10;
@@ -84,21 +84,18 @@
 <body>
   <div class="wrap">
     <div class="badge">Privacy Policy</div>
-    <h1>ChatGPT Day Grouper</h1>
-    <div class="updated">Last updated: August 15, 2026</div>
-
+    <h1>Group ChatGPT Chats by Date</h1>
+    <div class="updated">Last updated: August 18, 2026</div>
     <div class="card">
       <strong>Short version:</strong> This extension does not collect, transmit, sell, or share any of your
       data. Everything it does happens locally, inside your own browser.
     </div>
-
     <h2>What the extension does</h2>
     <p>
-      ChatGPT Day Grouper adds collapsible date headers (Today, Yesterday, and specific dates) to the
-      conversation sidebar on <code>chatgpt.com</code>, so your chat history is grouped by day instead
+      Group ChatGPT Chats by Date adds collapsible date headers (Today, Yesterday, and specific dates) to
+      the conversation sidebar on <code>chatgpt.com</code>, so your chat history is grouped by day instead
       of shown as one long list.
     </p>
-
     <h2>What data it accesses</h2>
     <p>
       To build these groups, the extension reads the conversation list that ChatGPT's own page already
@@ -109,7 +106,6 @@
       <li>Is never sent to any server, including any server operated by the developer</li>
       <li>Is not stored anywhere except transiently in memory while the page is open</li>
     </ul>
-
     <h2>What is stored, and where</h2>
     <p>
       The extension saves one small preference locally using Chrome's <code>storage</code> API:
@@ -118,37 +114,32 @@
       which is Google's own browser sync mechanism if you're signed into Chrome — not a server the
       developer controls or has access to).
     </p>
-
     <h2>Permissions used, and why</h2>
     <ul>
-      <li><code>storage</code> — save your collapse/expand preferences locally</li>
-      <li><code>activeTab</code> / <code>scripting</code> — inject the grouping UI into the ChatGPT tab
-        you're currently using</li>
+      <li><code>storage</code> — save your collapse/expand preferences and the on/off toggle, locally on
+        your device</li>
     </ul>
     <p>
       The extension only runs on <code>chatgpt.com</code>. It has no access to any other site you visit.
     </p>
-
     <h2>Third parties</h2>
     <p>
       There are none. No analytics, no tracking pixels, no ad networks, no external API calls of any kind.
     </p>
-
     <h2>Changes to this policy</h2>
     <p>
       If this policy ever changes, the updated version will be posted at this same URL with a new
       "last updated" date.
     </p>
-
     <h2>Contact</h2>
     <p>
       Questions about this policy or the extension can be raised via the Chrome Web Store support
-      section for this listing, or the project's GitHub repository.
+      section for this listing, or the project's GitHub repository:
+      <a href="https://github.com/rachit03heranwal/website">github.com/rachit03heranwal/website</a>.
     </p>
-
     <footer>
-      ChatGPT Day Grouper is an independent browser extension and is not affiliated with, endorsed by,
-      or sponsored by OpenAI.
+      Group ChatGPT Chats by Date is an independent browser extension and is not affiliated with,
+      endorsed by, or sponsored by OpenAI.
     </footer>
   </div>
 </body>
