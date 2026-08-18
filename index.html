@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group ChatGPT Chats by Date — Sidebar Organizer</title>
+<meta name="description" content="A polished, local-only Chrome extension that groups your ChatGPT sidebar conversations into Today, Yesterday, and specific dates, without replacing ChatGPT's native UI.">
+<style>
+  :root {
+    --bg: #0b0d10;
+    --bg-alt: #101317;
+    --card: #131619;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+    --accent: #38bdad;
+    --accent-2: #4f46e5;
+    --border: #23272b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: inherit; text-decoration: none; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Nav ---------- */
+  header.site {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(11,13,16,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .brand .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(145deg, var(--accent), var(--accent-2));
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent);
+    color: #04342c;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 88px 0 64px;
+    text-align: center;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-size: 44px;
+    line-height: 1.15;
+    max-width: 720px;
+    margin: 0 auto 20px;
+    letter-spacing: -0.02em;
+  }
+  .hero p.lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 32px;
+  }
+  .pill-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .pill-row span {
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .btn {
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .btn-primary {
+    background: linear-gradient(145deg, var(--accent), var(--accent-2));
+    color: #fff;
+  }
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .cta-row + p {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .cta-row + p a { color: var(--accent); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0; border-top: 1px solid var(--border); }
+  .eyebrow-small {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  h2 {
+    font-size: 28px;
+    max-width: 640px;
+    margin-bottom: 44px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- Workflow ---------- */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .step .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(56,189,173,0.14);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .step h3 { font-size: 16px; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--muted); }
+
+  /* ---------- Feature grid ---------- */
+  .feature-hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    margin-bottom: 20px;
+  }
+  .feature-hero h3 { font-size: 20px; margin-bottom: 12px; }
+  .feature-hero p { color: var(--muted); font-size: 15px; max-width: 560px; margin-bottom: 20px; }
+  .badge-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge-row span {
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(56,189,173,0.1);
+    border: 1px solid rgba(56,189,173,0.28);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .feature-card .tag {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .feature-card h4 { font-size: 15px; margin-bottom: 8px; }
+  .feature-card p { font-size: 13px; color: var(--muted); }
+
+  /* ---------- Privacy ---------- */
+  .privacy-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    text-align: center;
+  }
+  .privacy-box h3 { font-size: 22px; margin-bottom: 14px; }
+  .privacy-box p { color: var(--muted); max-width: 520px; margin: 0 auto 24px; font-size: 15px; }
+  .trust-row {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- Final CTA ---------- */
+  .final-cta { text-align: center; }
+  .final-cta h2 { margin: 0 auto 28px; text-align: center; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0 48px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer .foot-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+  footer .foot-links a:hover { color: var(--text); }
+
+  @media (max-width: 720px) {
+    h1 { font-size: 30px; }
+    .steps, .feature-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <nav>
+    <div class="brand"><span class="dot"></span> Group ChatGPT Chats by Date</div>
+    <div class="nav-links">
+      <a href="#why">Why it matters</a>
+      <a href="#how">How it works</a>
+      <a href="#privacy">Privacy</a>
+    </div>
+    <a class="nav-cta" href="#cta">Add to Chrome</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero" style="border-top:none;">
+    <span class="eyebrow">Local only · No account · Native ChatGPT sidebar stays intact</span>
+    <h1>Group the chats that pile up, without losing the sidebar you know.</h1>
+    <p class="lede">
+      ChatGPT's sidebar shows every conversation as one long list. This extension groups it into
+      Today, Yesterday, and specific dates automatically — no folders to build, no setup.
+    </p>
+    <div class="pill-row">
+      <span>Native sidebar preserved</span>
+      <span>Zero configuration</span>
+      <span>No analytics or backend</span>
+    </div>
+    <div class="cta-row" id="cta">
+      <a class="btn btn-primary" href="#">Add to Chrome — Free</a>
+      <a class="btn btn-secondary" href="privacy-policy.html">Read privacy policy</a>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="eyebrow-small">How it works</div>
+      <h2>The page should mirror what actually happens in the sidebar.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <h3>Chats load as usual</h3>
+          <p>ChatGPT's own sidebar loads your conversation list exactly like it always has.</p>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <h3>Grouped by date automatically</h3>
+          <p>Today, Yesterday, and specific dates appear as collapsible headers — no setup required.</p>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <h3>Collapse what you don't need</h3>
+          <p>Click any date header to fold it away. Your choice is remembered across sessions.</p>
+        </div>
+        <div class="step">
+          <div class="num">4</div>
+          <h3>Stays that way as you work</h3>
+          <p>New chats and older ones loaded by scrolling slot into the right group automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="container">
+      <div class="eyebrow-small">What it does</div>
+      <h2>One strong feature, not four equal-weight bullet points.</h2>
+
+      <div class="feature-hero">
+        <h3>Automatic date grouping inside the sidebar you already use</h3>
+        <p>
+          The highest-value claim is simple: a long, unstructured chat list becomes a scannable
+          one, without replacing ChatGPT's own interface or adding a separate panel.
+        </p>
+        <div class="badge-row">
+          <span>Today / Yesterday / specific dates</span>
+          <span>Collapse state remembered</span>
+          <span>Works with infinite scroll</span>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="tag">Toggle</div>
+          <h4>Turn grouping on or off anytime</h4>
+          <p>One switch in the popup. Disabling it instantly restores your normal sidebar view.</p>
+        </div>
+        <div class="feature-card">
+          <div class="tag">Live updates</div>
+          <h4>New chats land in the right group</h4>
+          <p>As you create chats or scroll to load older ones, groups update without a refresh.</p>
+        </div>
+        <div class="feature-card">
+          <div class="tag">Languages</div>
+          <h4>Available in 10 languages</h4>
+          <p>English, Spanish, Portuguese (BR), French, German, Japanese, Korean, Chinese, Russian, Hindi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="container">
+      <div class="eyebrow-small">Privacy</div>
+      <h2>Nothing leaves the browser.</h2>
+      <div class="privacy-box">
+        <h3>Local-only, by design.</h3>
+        <p>
+          No backend, no analytics, no third-party tracking, and nothing about your conversations
+          is sent anywhere. Chat titles and timestamps are read only to build the date groups, and
+          never leave your device.
+        </p>
+        <div class="trust-row">
+          <span>chrome.storage only</span>
+          <span>No external servers</span>
+          <span>Conversation content never stored</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="container">
+      <h2>Give your ChatGPT history a shape that scales past 50 chats.</h2>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#">Add to Chrome — Free</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-links">
+    <a href="privacy-policy.html">Privacy Policy</a>
+    <a href="https://chromewebstore.google.com/">Chrome Web Store</a>
+  </div>
+  <div class="container">
+    Group ChatGPT Chats by Date is an independent project and is not affiliated with OpenAI.
+  </div>
+</footer>
+
+</body>
+</html>
